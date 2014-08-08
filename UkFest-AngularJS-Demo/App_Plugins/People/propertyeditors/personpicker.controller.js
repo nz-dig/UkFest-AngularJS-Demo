@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("People.PersonPickerController", 
-	function($scope, dialogService){
+	function ($scope, personResource, dialogService) {
 		$scope.openPicker = function(){
 			dialogService.open({
 				template: "../app_plugins/people/propertyeditors/personpickerdialog.html",
@@ -8,15 +8,23 @@ angular.module("umbraco").controller("People.PersonPickerController",
 			});
 		};
 	
+		if (!isNaN($scope.model.value))
+		{
+		    personResource.getById($scope.model.value).then(function (response) {
+		        $scope.model.name = response.data.name;
+		    });
+		}
+	
+		
 		function populate(data) {
-		   
 		    $scope.safeApply($scope.setModelvalue(data));
-		    
-		};
+		  };
 
 
-		$scope.setModelvalue = function (newValue) {
-		    $scope.model.value = newValue;
+		$scope.setModelvalue = function (data) {
+		    $scope.model.value = data.id;
+		    $scope.model.name = data.name;
+
 		}
 
 		$scope.safeApply = function (fn) {
@@ -41,6 +49,7 @@ angular.module("umbraco").controller("People.PersonPickerDialogController",
 	     
 			args.event.preventDefault();
 			args.event.stopPropagation();
-			$scope.submit(args.node.id);
+			$scope.submit(args.node);
 		});
 	});
+
